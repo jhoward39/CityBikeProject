@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import File
+from .models import ProcessedFile
 
-class FileSerializer(serializers.ModelSerializer):
+class ProcessedFileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = File
+        model = ProcessedFile
         fields = ['file_name', 'file_path', 'last_modified', 'size']

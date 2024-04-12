@@ -1,32 +1,34 @@
 from django.db import models
 
-class File(models.Model):
+class ProcessedFile(models.Model):
     """
-    The File model represents a file in the system.
-    Each file has a unique name, a path, a last modified timestamp, a size in mb, and number of rows in the db.
+    The ProcessedFile model represents a file in the system.
+    Each file has a unique name, a path, a last modified timestamp, a size in byes, and number of rows in the db.
     """
-    file_name = models.CharField(max_length=255, primary_key=True)
+    file_id = models.AutoField(primary_key=True)
+    file_name = models.CharField(max_length=255, unique=True)
     file_path = models.CharField(max_length=255)
-    last_modified = models.DateTimeField()
-    size = models.FloatField()
+    parent_zip_last_modified = models.DateTimeField()
+    size = models.BigIntegerField()
     number_of_rows = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.file_name} ({self.size} MB) Last Modified: {self.last_modified}"
+        return f"{self.file_name} ({self.size} MB) Last Modified: {self.parent_zip_last_modified}"
     
 class ProcessingFile(models.Model):
     """
     The ProcessingFile model represents a file that is currently being processed.
-    Each processing file has a unique name, a path, a last modified timestamp, a size in mb, and number of rows in the db.
+    Each processing file has a unique name, a path, a last modified timestamp, a size in bytes, and number of rows in the db.
     """
-    file_name = models.CharField(max_length=255, primary_key=True)
+    file_id = models.AutoField(primary_key=True)
+    file_name = models.CharField(max_length=255, unique=True)
     file_path = models.CharField(max_length=255)
-    last_modified = models.DateTimeField()
-    size = models.FloatField()
+    parent_zip_last_modified = models.DateTimeField()
+    size = models.BigIntegerField()
     number_of_rows = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.file_name} ({self.size} MB) Last Modified: {self.last_modified}"
+        return f"{self.file_name} ({self.size} MB) Last Modified: {self.parent_zip_last_modified}"
 
 
 class Station(models.Model):
@@ -77,7 +79,7 @@ class Ride(models.Model):
     rider_birth_year = models.IntegerField(null=True, blank=True)
     rider_gender = models.IntegerField(choices=GENDER_CHOICES, default=0, null=True, blank=True)
     rider_member_or_casual = models.CharField(max_length=255, null=True, blank=True)
-    source_file = models.ForeignKey(File, on_delete=models.CASCADE,related_name='rides')
+    source_file = models.ForeignKey(ProcessedFile, on_delete=models.CASCADE,related_name='rides')
 
     def __str__(self):
         return f"Ride {self.ride_id} from Station {self.start_station_id} to Station {self.end_station_id}"
