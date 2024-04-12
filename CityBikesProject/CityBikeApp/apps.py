@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class CitybikesappConfig(AppConfig):
+class CitybikeappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'CityBikesApp'
+    name = 'CityBikeApp'
