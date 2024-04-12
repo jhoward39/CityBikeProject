@@ -6,13 +6,20 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import json
+from dateutil import parser
 import zipfile
 import django
+import os
+import csv
+from datetime import datetime
+import django
+from django.conf import settings
+from django.db.models import Max
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CityBikesProject.settings')
 django.setup()
 
-from CityBikeApp.models import ProcessedFile, ProcessingFile
+from CityBikeApp.models import ProcessedFile, ProcessingFile, Station, Bike, Ride
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -52,7 +59,13 @@ PROCESSED_DIR = "/Users/joeyhoward/Desktop/CityBikeData/Processed"
 #      3.2 If we have the file (latest version), delete it               #
 #                                                                        #
 #  4.0 Extract and Load data into the database                           #
-#      4.1 Import the data into the database                             #
+#      For every file Processing Dir:                                    #
+#      4.1 Pull out the rows                                             #              
+#      4.2 Normalize the data in the rows                                #    
+#      4.3 Bulk Insert that data into the DB                             #
+#      4.4 Move File from Processing to Processed                        #
+#      4.5 Create db Record of ProcessedFile                             #
+#      4.6 Delete db record of ProcessingFile                            #
 #      4.2 Move file to the processed directory                          #
 #                                                                        #
 #  Author: Joseph Howard                                                 #
@@ -94,7 +107,7 @@ class CityBikeDataImport:
                 counter += 1  # MOD Counter to limit the number of files processed
                 if counter % 3 == 0:  # MOD Limit the number of files processed
                     continue  # MOD Counter to limit the number of files processed
-                if counter > 16:  # MOD Counter to limit the number of files processed
+                if counter > 14:  # MOD Counter to limit the number of files processed
                     break  # MOD Counter to limit the number of files processed
 
                 logger.info(f"Processing {zip_file['filename']}")
@@ -134,11 +147,7 @@ class CityBikeDataImport:
             logger.error(e)
             return
         
-        logger.info("Ending 4.0 Extracting and loading data into the database")
         logger.info("CityBikeDataImport completed successfully!!!!")
-
-
-
 
     def get_files_from_web(self):
         '''
@@ -293,14 +302,173 @@ class CityBikeDataImport:
             [os.path.join(PROCESSING_DIR, f) for f in os.listdir(PROCESSING_DIR)],
             key=lambda x: os.path.getmtime(x),
             reverse=True  # Youngest files first
-        )[:10]  # Only process the first 10 files
+        ) 
 
         for file_path in files:
-            self.process_file(file_path)
+            file_name = os.path.basename(file_path)
+            if file_name.endswith('.csv') and not file_name.startswith('._'):
+                self.process_file(file_name)
+            
 
-    def process_file(self,file_path):
-        print(f"Processing {file_path}")
-        pass
+    def process_file(self, file_name): 
+        # 4.1 Pull out the rows
+        logger.debug(f"Pulling out data from {file_name}")
+
+        file_path = os.path.join(PROCESSING_DIR, file_name)
+        logger.debug(f"Opening {file_name} to parse and upload")
+        with open(file_path, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            header = reader.fieldnames
+            rows = list(reader)[:2]  ## MOD Read only the first 2 records for processing
+            self.normalize_rows(header, rows, file_path)
+
+    def convert_date(self, date_str):
+        try:
+            # Parse the date string to datetime
+            dt = parser.parse(date_str)
+            # Return the datetime object
+            return dt
+        except ValueError:
+            print(f"Error parsing date: {date_str}")
+            return None
+
+    def parse_row(self, row, is_old_format):
+        if is_old_format:
+            if row.get("birth year") == "\\N":
+                row["birth year"] = 0
+            row_data = {
+                'ride_id': row.get("ride_id"),
+                'start_station_id': row.get("start station sd"),
+                'start_station_name': row.get("start station same", "unknown"),
+                'start_station_lat': row.get("start station latitude"),
+                'start_station_lon': row.get("start station longitude"),
+                'end_station_id': row.get("end station id"),
+                'end_station_name': row.get("end station name", "unknown"),
+                'end_station_lat': row.get("end station latitude"),
+                'end_station_lon': row.get("end station longitude"),
+                'bike_id': row.get("bikeid"),
+                'rider_birth_year': int(float(str(row.get("birth year")))),
+                'rider_gender': row.get("gender"),
+                'started_at': self.convert_date(row["starttime"]),
+                'ended_at': self.convert_date(row["stoptime"]),
+                'bike_type': row.get("bike_type", 'unknown'),  # bike_type is not available in old format
+                'rider_member_or_casual': row.get("usertype", 'unknown')  # member_type is not available in old format
+            }
+            
+        else:
+            row_data = {
+                'ride_id': row.get("ride_id"),
+                'bike_type': row.get("rideable_type"),
+                'started_at': self.convert_date(row["started_at"]),
+                'ended_at': self.convert_date(row["ended_at"]),
+                'start_station_id': row.get("start_station_id"),
+                'start_station_name': row.get("start_station_name"),
+                'end_station_id': row.get("end_station_id"),
+                'end_station_name': row.get("end_station_name"),
+                'start_station_lat': row.get("start_lat"),
+                'start_station_lon': row.get("start_lng"),
+                'end_station_lat': row.get("end_lat"),
+                'end_station_lon': row.get("end_lng"),
+                'rider_member_or_casual': row.get("member_casual"),
+                'bike_id': row.get("bike_id"),
+                'rider_birth_year': 0,
+                'rider_gender': 0,
+                
+            }
+        
+        return row_data
+    
+
+    def normalize_rows(self, header, rows, file_path):
+        #4.2 Normalize the data in the rows
+        logger.debug(f"Normalizing {len(rows)} records from {file_path}")
+
+        processing_file = ProcessingFile.objects.get(file_name=os.path.basename(file_path))
+        
+        # Create a processed file record to be a foreign key for the rides
+        processed_file, created_processed_file = ProcessedFile.objects.update_or_create(
+            file_name=processing_file.file_name,
+            defaults={
+                'file_path': processing_file.file_path.replace("Processing", "Processed"),
+                'parent_zip_last_modified': processing_file.parent_zip_last_modified,
+                'size': processing_file.size,
+                'number_of_rows': len(rows)
+            }
+        )
+        
+        logger.info(f"Created or Updated ProcessedFile record {processed_file}")
+
+        ride_objects = []
+        is_old_format = "tripduration" in header
+        for row in rows:
+            print("raw",row)
+            # Dyanmically map the fields based on the header
+            parsed_row =  self.parse_row(row, is_old_format)
+            print("parsed", parsed_row)
+
+            # Create or get Station and Bike instances
+            if parsed_row.get("start_station_id"):
+                station_id = int(float(parsed_row.get("start_station_id")))
+            else:
+                station_id = None
+            start_station, _ = Station.objects.get_or_create(
+                
+                station_id=station_id,
+                defaults={'station_name': parsed_row.get('start_station_name'), 'lat': float(row.get('start_lat', 0)), 'lon': float(row.get('start_lng', 0))}
+            )
+
+            if parsed_row.get("end_station_id"):
+                station_id = int(float(parsed_row.get("end_station_id")))
+            else:
+                station_id = None
+
+            end_station, _ = Station.objects.get_or_create(
+                station_id=station_id,
+                defaults={'station_name': parsed_row.get('end_station_name'), 'lat': float(row.get('end_lat', 0)), 'lon': float(row.get('end_lng', 0))}
+            )
+
+            bike, _ = Bike.objects.get_or_create(
+                bike_id=parsed_row.get('bike_id'),
+                bike_type=parsed_row.get('bike_type')
+            )
+
+            ride = Ride(
+                ride_id=row.get('ride_id'),
+                started_at=parsed_row.get('started_at'),
+                ended_at=parsed_row.get('ended_at'),
+                start_station=start_station,
+                end_station=end_station,
+                bike=bike,
+                rider_birth_year=int(parsed_row.get('rider_birth_year', 0)),
+                rider_gender=int(parsed_row.get('rider_gender', 0)),
+                rider_member_or_casual=parsed_row.get('user_type', 'unknown'),
+                source_file=processed_file
+            )
+            ride_objects.append(ride)
+            
+
+        logger.debug(f"Adding {len(ride_objects)} records to the Ride model")
+        Ride.objects.bulk_create(ride_objects, batch_size=998)
+        logger.debug(f"Successfully added {len(ride_objects)} records to the Ride model")
+        self.move_file_from_processing_to_processed(os.path.basename(file_path))
+        logger.debug(f"Deleting {processing_file.file_name} from the ProcessingFile model")
+        processing_file.delete()
+        return
+    
+    def move_file_from_processing_to_processed(self,file_name):
+        processing_file = os.path.join(PROCESSING_DIR, file_name)
+        processed_file = os.path.join(PROCESSED_DIR, file_name)
+        try:
+            shutil.move(processing_file, processed_file)
+            logger.info(f"Moved {file_name} from processing to processed directory")
+        except Exception as e:
+            logger.error(f"Failed to move {file_name} from processing to processed directory")
+            logger.error(e)
+            return
+    
+    
+    
+
 if __name__ == "__main__":
     Import = CityBikeDataImport()
     Import.execute()
