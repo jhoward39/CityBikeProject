@@ -1,15 +1,88 @@
-2024-04-11 21:05:33,468 - INFO - Initialized CityBikeDataImport with base URL: https://s3.amazonaws.com/tripdata/
-2024-04-11 21:05:33,469 - INFO - Getting file names from https://s3.amazonaws.com/tripdata/
-2024-04-11 21:05:33,474 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
-2024-04-11 21:05:33,936 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/ HTTP/1.1" 200 None
-2024-04-11 21:05:33,991 - DEBUG - Encoding detection: utf_8 is most likely the one.
-2024-04-11 21:05:34,000 - INFO - Found 117 file(s)
-2024-04-11 21:05:34,001 - INFO - Checking if files are in the database
-2024-04-11 21:05:34,002 - DEBUG - Starting new HTTP connection (1): 127.0.0.1:8000
-2024-04-11 21:05:34,004 - DEBUG - http://127.0.0.1:8000 "GET /api/get_files/ HTTP/1.1" 200 110
-2024-04-11 21:05:34,004 - INFO - Fetched 1 file record(s) from API.
-2024-04-11 21:05:34,004 - INFO - Filtering out files that are already downloaded
-2024-04-11 21:05:34,004 - INFO - Sending 117 files to API for download and storage
-2024-04-11 21:05:34,005 - DEBUG - Starting new HTTP connection (1): 127.0.0.1:8000
-2024-04-11 21:05:34,019 - DEBUG - http://127.0.0.1:8000 "POST /api/upload_files/ HTTP/1.1" 500 123800
-2024-04-11 21:05:34,019 - ERROR - <Response [500]>
+2024-04-12 00:00:29,776 - INFO - Initialized CityBikeDataImport with base URL: https://s3.amazonaws.com/tripdata/
+2024-04-12 00:00:29,776 - INFO - Getting file names from https://s3.amazonaws.com/tripdata/
+2024-04-12 00:00:29,807 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:00:30,220 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/ HTTP/1.1" 200 None
+2024-04-12 00:00:30,273 - DEBUG - Encoding detection: utf_8 is most likely the one.
+2024-04-12 00:00:30,283 - INFO - Found 117 file(s)
+2024-04-12 00:00:30,284 - INFO - Putting files in the processing directory
+2024-04-12 00:00:30,284 - INFO - Processing 2013-citibike-tripdata.zip
+2024-04-12 00:00:30,286 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:00:30,515 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/2013-citibike-tripdata.zip HTTP/1.1" 200 329797836
+2024-04-12 00:00:43,192 - INFO - Downloaded 2013-citibike-tripdata.zip successfully.
+2024-04-12 00:00:43,193 - DEBUG - Extracting 2013-citibike-tripdata.zip
+2024-04-12 00:00:45,122 - DEBUG - Found 7 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmp9h6i3a7n/2013-citibike-tripdata
+2024-04-12 00:00:45,122 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:00:45,133 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:00:45,134 - INFO - Processing 2015-citibike-tripdata.zip
+2024-04-12 00:00:45,169 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:00:45,472 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/2015-citibike-tripdata.zip HTTP/1.1" 200 276450868
+2024-04-12 00:00:56,299 - INFO - Downloaded 2015-citibike-tripdata.zip successfully.
+2024-04-12 00:00:56,300 - DEBUG - Extracting 2015-citibike-tripdata.zip
+2024-04-12 00:00:57,894 - DEBUG - Found 1 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmpgrjgs8em/2015-citibike-tripdata/4_April
+2024-04-12 00:00:57,895 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:00:57,907 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:00:57,908 - INFO - Processing 2017-citibike-tripdata.zip
+2024-04-12 00:00:57,909 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:00:58,193 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/2017-citibike-tripdata.zip HTTP/1.1" 200 557126574
+2024-04-12 00:01:34,148 - INFO - Downloaded 2017-citibike-tripdata.zip successfully.
+2024-04-12 00:01:34,148 - DEBUG - Extracting 2017-citibike-tripdata.zip
+2024-04-12 00:01:37,093 - DEBUG - Found 2 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmpae558qw4/2017-citibike-tripdata/4_April
+2024-04-12 00:01:37,093 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:01:37,110 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:01:37,111 - INFO - Processing 2019-citibike-tripdata.zip
+2024-04-12 00:01:37,132 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:01:37,478 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/2019-citibike-tripdata.zip HTTP/1.1" 200 858704099
+2024-04-12 00:02:40,323 - INFO - Downloaded 2019-citibike-tripdata.zip successfully.
+2024-04-12 00:02:40,324 - DEBUG - Extracting 2019-citibike-tripdata.zip
+2024-04-12 00:02:45,079 - DEBUG - Found 2 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmp94eka4sh/2019-citibike-tripdata/4_April
+2024-04-12 00:02:45,079 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:02:45,102 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:02:45,105 - INFO - Processing 2021-citibike-tripdata.zip
+2024-04-12 00:02:45,132 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:02:45,474 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/2021-citibike-tripdata.zip HTTP/1.1" 200 915832638
+2024-04-12 00:03:37,952 - INFO - Downloaded 2021-citibike-tripdata.zip successfully.
+2024-04-12 00:03:37,954 - DEBUG - Extracting 2021-citibike-tripdata.zip
+2024-04-12 00:03:43,341 - DEBUG - Found 3 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmpw2nuh5w8/2021-citibike-tripdata/4_April
+2024-04-12 00:03:43,341 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:03:43,376 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:03:43,377 - INFO - Processing 2023-citibike-tripdata.zip
+2024-04-12 00:03:43,401 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:03:43,740 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/2023-citibike-tripdata.zip HTTP/1.1" 200 1393376589
+2024-04-12 00:05:02,959 - INFO - Downloaded 2023-citibike-tripdata.zip successfully.
+2024-04-12 00:05:02,960 - DEBUG - Extracting 2023-citibike-tripdata.zip
+2024-04-12 00:05:10,659 - DEBUG - Found 3 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmpuqbml8nl/2023-citibike-tripdata/4_April
+2024-04-12 00:05:10,659 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:05:10,702 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:05:10,703 - INFO - Processing 202402-citibike-tripdata.csv.zip
+2024-04-12 00:05:10,722 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:05:11,051 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/202402-citibike-tripdata.csv.zip HTTP/1.1" 200 89604513
+2024-04-12 00:05:25,027 - INFO - Downloaded 202402-citibike-tripdata.csv.zip successfully.
+2024-04-12 00:05:25,028 - DEBUG - Extracting 202402-citibike-tripdata.csv.zip
+2024-04-12 00:05:25,527 - DEBUG - Found 3 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmpjg7h59mu
+2024-04-12 00:05:25,527 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:05:25,529 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:05:25,530 - INFO - Processing JC-201509-citibike-tripdata.csv.zip
+2024-04-12 00:05:25,531 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:05:25,753 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/JC-201509-citibike-tripdata.csv.zip HTTP/1.1" 200 127657
+2024-04-12 00:05:25,978 - INFO - Downloaded JC-201509-citibike-tripdata.csv.zip successfully.
+2024-04-12 00:05:25,979 - DEBUG - Extracting JC-201509-citibike-tripdata.csv.zip
+2024-04-12 00:05:25,982 - DEBUG - Found 1 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmp5_ndf0hj
+2024-04-12 00:05:25,983 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:05:25,983 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:05:25,985 - INFO - Processing JC-201511-citibike-tripdata.csv.zip
+2024-04-12 00:05:25,988 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:05:26,230 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/JC-201511-citibike-tripdata.csv.zip HTTP/1.1" 200 288054
+2024-04-12 00:05:26,676 - INFO - Downloaded JC-201511-citibike-tripdata.csv.zip successfully.
+2024-04-12 00:05:26,678 - DEBUG - Extracting JC-201511-citibike-tripdata.csv.zip
+2024-04-12 00:05:26,686 - DEBUG - Found 1 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmpq07jdv8v
+2024-04-12 00:05:26,686 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:05:26,687 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:05:26,689 - INFO - Processing JC-201601-citibike-tripdata.csv.zip
+2024-04-12 00:05:26,692 - DEBUG - Starting new HTTPS connection (1): s3.amazonaws.com:443
+2024-04-12 00:05:26,956 - DEBUG - https://s3.amazonaws.com:443 "GET /tripdata/JC-201601-citibike-tripdata.csv.zip HTTP/1.1" 200 144314
+2024-04-12 00:05:27,011 - INFO - Downloaded JC-201601-citibike-tripdata.csv.zip successfully.
+2024-04-12 00:05:27,012 - DEBUG - Extracting JC-201601-citibike-tripdata.csv.zip
+2024-04-12 00:05:27,016 - DEBUG - Found 1 files in /var/folders/bp/h9f3jtwx3nxcy1qt7sypvjbr0000gn/T/tmpb8n8aoem
+2024-04-12 00:05:27,017 - DEBUG - Stopping after the first CSV file has been moved...
+2024-04-12 00:05:27,017 - DEBUG - Moved 1 files to /Users/joeyhoward/Desktop/CityBikeData/Processing
+2024-04-12 00:05:27,019 - INFO - All files in the processing directory
